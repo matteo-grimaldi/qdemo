@@ -225,6 +225,21 @@ questi passaggi richiedono che sia installato sul pc il tool *gh* (GitHub intera
 
 seguire il processo interattivo.
 
+### PASSO 7 - Red Hat OpenShift
+
+Se è stato creato il repo su GitHub a questo punto è possibile installare l'applicazione su una piattaforma OpenShift.
+
+##### Deploy tramite developer console
+
+Accedere ad openshift usando la vista *developer*.
+
+1. creare un nuovo progetto;
+2. dall'opzione **+Add** scegliere la strategia *GIT Repository - import from Git*;
+3. specificare la URL del repo Git;
+4. specificare gli ulteriori parametri (nome, deployment, ecc.). Si consiglia l'opzione Deployment;
+5. completare la creazione con il comando *Create*.
+
+accedere all'applicazione usando l'opportuno link disponibile nella vista *Topology* del progetto.
 
 ## Packaging and running the application
 
