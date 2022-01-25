@@ -7,7 +7,7 @@ In particolare la facilita' con cui si avviano i progetti, la facilita' con cui 
 La demo è divisa in 3 parti:
 
 - **Prima parte**
-    - Download di un archivio di quickstar
+    - Download di un archivio di quickstart
     - Build e Run di un primo MVP di applicazione
     - Overview del Dev Mode
 - **Seconda Parte**
@@ -56,7 +56,7 @@ In questa parte diamo persistenza a degli oggetti usando MongoDB e Panache, per 
 sempre in **dev mode** da un'altra finestra del terminale aggiungi le estensioni per Panache usando il comando: 
 
 ```shell script
-./mvnw quarkus:add-extension -Dextensions="quarkus-mongodb-client, quarkus-mongodb-panache"
+> ./mvnw quarkus:add-extension -Dextensions="quarkus-mongodb-client, quarkus-mongodb-panache"
 ```
 
 aggiungi un paio di classi Java, NOTA: per la demo non e' importante usare i package ma nel caso la classe Car va messa in un package denominato *model* e la classe CarResource va messa in un package denominato *rest*.
@@ -178,7 +178,7 @@ inserire o cancellare oggetti dal database ed utilizzare la ricerca *By Brand*.
 in **dev mode** da un'altra finestra del terminale aggiungi le estensioni per Panache usando il comando: 
 
 ```shell script
-./mvnw quarkus:add-extension -Dextensions="quarkus-smallrye-reactive-messaging-kafka"
+> ./mvnw quarkus:add-extension -Dextensions="quarkus-smallrye-reactive-messaging-kafka"
 ```
 
 **Car.java**
@@ -206,13 +206,13 @@ Aggiungere un emitter e un POST endpoint per attivare un producer
 Una volta richiamata la POST API per inserire le richieste
 
 ```shell script
-    curl -X POST http://localhost:8080/entity/cars/request 
+> curl -X POST http://localhost:8080/entity/cars/request 
 ```
 
 tilizzare un consumer esterno per verificare la presenza del Kafka Broker e i messaggi prodotti tramite estensione dell'IDE o kcat
 
 ```shell script
-    kcat -b <broker-endpoint> -t <topic-name>
+> kcat -b <broker-endpoint> -t <topic-name>
 ```
 
 #### PASSO 4 - mettere l'applicazione in un container
@@ -271,6 +271,14 @@ seguire il processo interattivo.
 
 Se è stato creato il repo su GitHub a questo punto è possibile installare l'applicazione su una piattaforma OpenShift.
 
+### Terza Parte
+
+In questa parte viene descritto come analizzare una applicazione springBoot in ottica migrazione a Quarkus tramite Red Hat Migration Toolking for Applications in modalità standalone 
+
+#### PASSO 6 - Red Hat OpenShift
+
+Scaricare l'archivio contenente l'ultima versione del migration toolkit da https://developers.redhat.com/products/mta/download?source=sso
+
 ### Extras
 
 ##### Deploy tramite developer console
@@ -289,7 +297,7 @@ accedere all'applicazione usando l'opportuno link disponibile nella vista *Topol
 
 The application can be packaged using:
 ```shell script
-./mvnw package
+> ./mvnw package
 ```
 It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
 Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
@@ -307,12 +315,12 @@ The application, packaged as an _über-jar_, is now runnable using `java -jar ta
 
 You can create a native executable using: 
 ```shell script
-./mvnw package -Pnative
+> ./mvnw package -Pnative
 ```
 
 Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
 ```shell script
-./mvnw package -Pnative -Dquarkus.native.container-build=true
+> ./mvnw package -Pnative -Dquarkus.native.container-build=true
 ```
 
 You can then execute your native executable with: `./target/qdemo-1.0.0-SNAPSHOT-runner`
