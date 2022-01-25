@@ -4,9 +4,30 @@ Un progetto demo per mostrare alcune funzionalita' di Quarkus.
 
 In particolare la facilita' con cui si avviano i progetti, la facilita' con cui si aggiungono librerie (extensions) e la facilita' con cui si da persistenza agli oggetti tramite Panache.
 
+La demo è divisa in 3 parti:
+
+- **Prima parte**
+    - Download di un archivio di quickstar
+    - Build e Run di un primo MVP di applicazione
+    - Overview del Dev Mode
+- **Seconda Parte**
+    - Aggiunta estensioni per persistenza e messaging
+    - Overview sui Dev Services
+    - Overview su Continous Testing
+- **Terza Parte**
+    - Overview su Migration Toolkit for Application per il passaggio da Spring Boot a Quarkus
+
 ## Per eseguire la demo
 
-### PASSO 1
+Dato lo scopo della demo, nessuna configurazione o tool specifico è necessario per completare i diversi passi, in particolare sono necessari solamente:
+- Connessione ad Internet 
+- Terminale
+- Editor di Testo
+- Docker in esecuzione
+
+### Prima Parte
+
+#### PASSO 1
 
 Genera il pacchetto per cominciare un progetto da https://code.quarkus.io/
 
@@ -20,14 +41,15 @@ scarica lo zip, esplodi il file in una directory locale, apri un terminale ed es
 
 apri il browser e collegati con http://localhost:8080, accedi anche al servizio http://localhost:8080/hello e verifica che tutto funzioni, welcome page nel primo link e il classico *Hello RESTEasy* nel secondo.
 
-### PASSO 2
+#### PASSO 2
 
 In **dev mode** edita la classe *GreetingResource.java* e cambia il saluto, (se non hai l'auto save abilitato salva il file), e ricarica sara' visibile il nuovo messaggio.
 
 **NOTA:** aggiornare di conseguenza anche la classe di test altrimenti la compilazione in fase di build non funziona.
 
+### Seconda Parte
 
-### PASSO 3 - aggiungere le estensioni per MongoDB
+#### PASSO 1 - aggiungere le estensioni per MongoDB
 
 In questa parte diamo persistenza a degli oggetti usando MOngoDB e Panache, per questa demo si suppone che ci sia un DB mongo up & running (si può facilmente usare docker o podman).
 
@@ -135,7 +157,7 @@ per inserire o modificare o rimuovere oggetti dal database usare, tramite un sec
 > curl -H "Content-Type: application/json" -X POST -d '{"brand":"mustang","model":"shelby"}' http://localhost:8080/cars
 ```
 
-### PASSO 4 - lavorare con Panache
+#### PASSO 2 - lavorare con Panache
 
 Solo al fine di mostrare l'utilizzo di Panache si può a questo punto aggiungere una specifica query al database modificando le due classi precedenti in questo modo:
 
@@ -173,7 +195,7 @@ aggiungere le seguenti righe:
 
 inserire o cancellare oggetti dal database ed utilizzare la ricerca *By Brand*.
 
-### PASSO 5 - mettere l'applicazione in un container
+#### PASSO 3 - mettere l'applicazione in un container
 
 Aggiungere il dockerfile (spiegare il motivo del multi-stage build)
 
@@ -209,7 +231,7 @@ eseguire l'applicazione tramite podman
 quando l'applicazione viene eseguita dentro un container l'indirizzo *localhost* non è più valido occorre quindi fornire l'apposita variabile di riferimento, nell'esempio occorre sostituire l'indirizzo con quello ip della macchina dove è in esecuzione il database MongoDB.
 
 
-### PASSO 6 - creare repo GIT
+#### PASSO 4 - creare repo GIT
 
 Aggiungere il progetto ad un repo GIT - [documentation]{https://docs.github.com/en/github/importing-your-projects-to-github/importing-source-code-to-github/adding-an-existing-project-to-github-using-the-command-line}.
 
@@ -225,9 +247,11 @@ questi passaggi richiedono che sia installato sul pc il tool *gh* (GitHub intera
 
 seguire il processo interattivo.
 
-### PASSO 7 - Red Hat OpenShift
+#### PASSO 5 - Red Hat OpenShift
 
 Se è stato creato il repo su GitHub a questo punto è possibile installare l'applicazione su una piattaforma OpenShift.
+
+### Extras
 
 ##### Deploy tramite developer console
 
