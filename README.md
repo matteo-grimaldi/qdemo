@@ -2,7 +2,7 @@
 
 Un progetto demo per mostrare alcune funzionalita' di Quarkus.
 
-In particolare la facilita' con cui si avviano i progetti, la facilita' con cui si aggiungono librerie (extensions) e la facilita' con cui si da persistenza agli oggetti tramite Panache.
+In particolare la facilita' con cui si avviano i progetti, la facilita' con cui si aggiungono librerie (extensions) e la facilita' con cui si da persistenza agli oggetti tramite Panache, oltre che al supporto dei Dev Services.
 
 La demo è divisa in 3 parti:
 
@@ -21,6 +21,7 @@ La demo è divisa in 3 parti:
 
 Dato lo scopo della demo, nessuna configurazione o tool specifico è necessario per completare i diversi passi, in particolare sono necessari solamente:
 - Connessione ad Internet 
+- Browser 
 - Terminale
 - Editor di Testo
 - Docker in esecuzione
@@ -33,13 +34,17 @@ Genera il pacchetto per cominciare un progetto da https://code.quarkus.io/
 
 per iniziare aggiungi solo le estensioni RESTEasy JAX-RS e RESTEasy jackson.
 
-scarica lo zip, esplodi il file in una directory locale, apri un terminale ed esegui il comando:
+scarica lo zip, estrai il file in una directory locale, apri un terminale ed esegui il comando:
 
 ```shell script
-./mvnw compile quarkus:dev
+> ./mvnw compile quarkus:dev
 ```
 
-apri il browser e collegati con http://localhost:8080, accedi anche al servizio http://localhost:8080/hello e verifica che tutto funzioni, welcome page nel primo link e il classico *Hello RESTEasy* nel secondo.
+apri il browser e collegati con http://localhost:8080, accedi anche al servizio http://localhost:8080/hello e verifica che tutto funzioni, welcome page nel primo link e il classico *Hello RESTEasy* nel secondo. È logicamente anche possibile invocare l'endpoint tramite curl:
+
+```shell script
+> curl localhost:8080/hello
+```
 
 #### PASSO 2
 
@@ -59,7 +64,7 @@ sempre in **dev mode** da un'altra finestra del terminale aggiungi le estensioni
 > ./mvnw quarkus:add-extension -Dextensions="quarkus-mongodb-client, quarkus-mongodb-panache"
 ```
 
-aggiungi un paio di classi Java, NOTA: per la demo non e' importante usare i package ma nel caso la classe Car va messa in un package denominato *model* e la classe CarResource va messa in un package denominato *rest*.
+Inserire le due seguenti classi Java, per avere un model e una resource per utilizzare Panache e MongoDB. NOTA: Ai fini della demo non è importante il path, ma logicamente tali classi Java dovrebbero essere collocate nelle directory dedicate come da best practices.
 
 **Car.java**
 
@@ -67,9 +72,7 @@ aggiungi un paio di classi Java, NOTA: per la demo non e' importante usare i pac
 package org.acme;
 
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
-import io.quarkus.mongodb.panache.common.MongoEntity;
 
-@MongoEntity(collection="cars")
 public class Car extends PanacheMongoEntity {
 
     public String brand;
@@ -135,6 +138,14 @@ public class CarResource {
 }
 ```
 
+Per inzializzare la collection dell'istanza MongoDB avviata dai Dev Services, è possibile sfruttare direttamente le API esposte dall'applicazione:
+
+```shell script
+> curl -X POST http://localhost:8080/cars -H "Content-Type: application/json" -d '{"brand":"fiat","model":"panda"}'
+```
+
+L'applicazione genererà un errore, perchè non a conoscenza del nome del database. Esaminando l'errore, il servizio necessita la configurazione del nome del database, è sufficiente sfruttare la Dev UI e cercare la property quarkus.mongodb.database per dare un nome arbitrario alla basedati.
+
 #### PASSO 2 - lavorare con Panache
 
 Solo al fine di mostrare l'utilizzo di Panache si può a questo punto aggiungere una specifica query al database modificando le due classi precedenti in questo modo:
@@ -175,7 +186,7 @@ inserire o cancellare oggetti dal database ed utilizzare la ricerca *By Brand*.
 
 #### PASSO 3 - aggiungere le esterioni per il reactive messaging con smallRye e Kafka
 
-in **dev mode** da un'altra finestra del terminale aggiungi le estensioni per Panache usando il comando: 
+in **dev mode** da un'altra finestra del terminale aggiungi l'estensione per il reactive messaging con kafka tramite il comando: 
 
 ```shell script
 > ./mvnw quarkus:add-extension -Dextensions="quarkus-smallrye-reactive-messaging-kafka"
@@ -206,16 +217,38 @@ Aggiungere un emitter e un POST endpoint per attivare un producer
 Una volta richiamata la POST API per inserire le richieste
 
 ```shell script
-> curl -X POST http://localhost:8080/entity/cars/request 
+> curl -X POST http://localhost:8080/cars/request 
 ```
 
-tilizzare un consumer esterno per verificare la presenza del Kafka Broker e i messaggi prodotti tramite estensione dell'IDE o kcat
+utilizzare un consumer esterno per verificare la presenza del Kafka Broker e i messaggi prodotti tramite estensione dell'IDE o kcat
 
 ```shell script
 > kcat -b <broker-endpoint> -t <topic-name>
 ```
 
-#### PASSO 4 - mettere l'applicazione in un container
+### Terza Parte
+
+In questa parte viene descritto come analizzare una applicazione springBoot in ottica migrazione a Quarkus tramite Red Hat Migration Toolking for Applications in modalità standalone 
+
+#### PASSO 1 - Esecuzione Web Application
+
+Scaricare l'archivio contenente l'ultima versione del migration toolkit da https://developers.redhat.com/products/mta/download?source=sso
+
+Estrarre l'archivio ottenuto ed avviare il server tramite:
+
+```shell script
+> ./run_mta.sh
+```
+
+#### PASSO 2 - Creazione progetto e Analisi artefatto
+
+Tramite il wizard, caricare e configurare il jar di una applicazione SpringBoot per ottenere la generazione del report dell'analisi della migrazione.
+
+
+
+### Extras
+
+#### PASSO 1 - mettere l'applicazione in un container
 
 Aggiungere il dockerfile (spiegare il motivo del multi-stage build)
 
@@ -250,10 +283,9 @@ eseguire l'applicazione tramite podman
 
 quando l'applicazione viene eseguita dentro un container l'indirizzo *localhost* non è più valido occorre quindi fornire l'apposita variabile di riferimento, nell'esempio occorre sostituire l'indirizzo con quello ip della macchina dove è in esecuzione il database MongoDB.
 
+#### PASSO 2 - creare repo GIT
 
-#### PASSO 5 - creare repo GIT
-
-Aggiungere il progetto ad un repo GIT - [documentation]{https://docs.github.com/en/github/importing-your-projects-to-github/importing-source-code-to-github/adding-an-existing-project-to-github-using-the-command-line}.
+Aggiungere il progetto ad un repo GIT - ([documentation](https://docs.github.com/en/github/importing-your-projects-to-github/importing-source-code-to-github/adding-an-existing-project-to-github-using-the-command-line)).
 
 questi passaggi richiedono che sia installato sul pc il tool *gh* (GitHub interactive CLI).
 
@@ -267,19 +299,9 @@ questi passaggi richiedono che sia installato sul pc il tool *gh* (GitHub intera
 
 seguire il processo interattivo.
 
-#### PASSO 6 - Red Hat OpenShift
+#### PASSO 3 - Red Hat OpenShift
 
 Se è stato creato il repo su GitHub a questo punto è possibile installare l'applicazione su una piattaforma OpenShift.
-
-### Terza Parte
-
-In questa parte viene descritto come analizzare una applicazione springBoot in ottica migrazione a Quarkus tramite Red Hat Migration Toolking for Applications in modalità standalone 
-
-#### PASSO 6 - Red Hat OpenShift
-
-Scaricare l'archivio contenente l'ultima versione del migration toolkit da https://developers.redhat.com/products/mta/download?source=sso
-
-### Extras
 
 ##### Deploy tramite developer console
 
