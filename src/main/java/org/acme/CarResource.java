@@ -1,8 +1,8 @@
 package org.acme;
 
 import java.util.List;
+import java.util.UUID;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -14,23 +14,18 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.bson.types.ObjectId;
-
-import io.quarkus.mongodb.panache.PanacheMongoEntityBase;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 @Path("/cars")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
 public class CarResource {
-    
-    @GET
-    public List<PanacheMongoEntityBase> list() {
-        return Car.listAll();
-    }
+
+    @Channel("requests")
+    Emitter<String> myEmitter;
 
     @GET
-    @Path("/{brand}")
-    public List<Car> getByBrand(@PathParam("brand") String brand) {
-        return Car.listByBrand(brand);
+    public List<Car> list() {
+        return Car.listAll();
     }
 
     @POST
@@ -55,4 +50,18 @@ public class CarResource {
         car.delete();
     }
 
+    @GET
+    @Path("/{brand}")
+    public List<Car> getByBrand(@PathParam("brand") String brand) {
+        return Car.listByBrand(brand);
+    }
+
+    @POST
+    @Path("/request")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String createRequest() {
+        UUID uuid = UUID.randomUUID();
+        myEmitter.send(uuid.toString());
+        return uuid.toString() + " booking added.";
+    }
 }

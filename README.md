@@ -101,15 +101,13 @@ import javax.ws.rs.core.MediaType;
 
 import org.bson.types.ObjectId;
 
-import io.quarkus.mongodb.panache.PanacheMongoEntityBase;
-
 @Path("/cars")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class CarResource {
     
     @GET
-    public List<PanacheMongoEntityBase> list() {
+    public List<Car> list() {
         return Car.listAll();
     }
 
@@ -141,7 +139,7 @@ public class CarResource {
 Per inzializzare la collection dell'istanza MongoDB avviata dai Dev Services, è possibile sfruttare direttamente le API esposte dall'applicazione:
 
 ```shell script
-> curl -X POST http://localhost:8080/cars -H "Content-Type: application/json" -d '{"brand":"fiat","model":"panda"}'
+> curl -X POST http://localhost:8080/cars -H "Content-Type: application/json" -d '{"brand":"fiat","name":"panda"}'
 ```
 
 L'applicazione genererà un errore, perchè non a conoscenza del nome del database. Esaminando l'errore, il servizio necessita la configurazione del nome del database, è sufficiente sfruttare la Dev UI e cercare la property quarkus.mongodb.database per dare un nome arbitrario alla basedati.
