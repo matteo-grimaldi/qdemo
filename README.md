@@ -51,7 +51,7 @@ In **dev mode** edita la classe *GreetingResource.java* e cambia il saluto, (se 
 
 #### PASSO 1 - aggiungere le estensioni per MongoDB
 
-In questa parte diamo persistenza a degli oggetti usando MOngoDB e Panache, per questa demo si suppone che ci sia un DB mongo up & running (si può facilmente usare docker o podman).
+In questa parte diamo persistenza a degli oggetti usando MongoDB e Panache, per questa demo non è necessario che sia disponibile un'istanza locale, in quanto i Dev Services provvederanno ad avviare i container necessari all'avvio del Dev Mode (supportato da Docker out-of-the-box, ma è possibile utilizzare podman con alcuni workaround).
 
 sempre in **dev mode** da un'altra finestra del terminale aggiungi le estensioni per Panache usando il comando: 
 
@@ -133,28 +133,6 @@ public class CarResource {
     }
 
 }
-```
-
-Ora occorre fornire le informazioni per accedere al database mongo, questo avviene tramite alcune properties nel file *src/main/resources/application.properties*, editare il file aggiungendo le seguenti informazioni.
-
-```shell script
-quarkus.mongodb.connection-string=${MONGOCONNSTRING:mongodb://localhost:27017/demo}
-quarkus.mongodb.database=demo
-```
-
-per inserire o modificare o rimuovere oggetti dal database usare, tramite un secondo terminale, i seguenti comandi CURL:
-
-```shell script
-> curl -H "Content-Type: application/json" -X POST -d '{"brand":"fiat","model":"panda"}' http://localhost:8080/cars
-> curl -H "Content-Type: application/json" -X POST -d '{"brand":"fiat","model":"punto"}' http://localhost:8080/cars
-> curl http://localhost:8080/cars
-> curl -H "Content-Type: application/json" -X PUT -d '{"id":"61e5378d40475349c273f4b2","brand":"fiat","model":"croma"}' http://localhost:8080/cars
-> curl -H "Content-Type: application/json" -X POST -d '{"brand":"fiat","model":"punto"}' http://localhost:8080/cars
-> curl -H "Content-Type: application/json" -X DELETE http://localhost:8080/cars/61e5378d40475349c273f4b2
-> curl -H "Content-Type: application/json" -X POST -d '{"brand":"AlfaRomeo","model":"mito"}' http://localhost:8080/cars
-> curl -H "Content-Type: application/json" -X POST -d '{"brand":"ford","model":"kuga"}' http://localhost:8080/cars
-> curl -H "Content-Type: application/json" -X POST -d '{"brand":"mustang","model":"GT"}' http://localhost:8080/cars
-> curl -H "Content-Type: application/json" -X POST -d '{"brand":"mustang","model":"shelby"}' http://localhost:8080/cars
 ```
 
 #### PASSO 2 - lavorare con Panache
@@ -302,6 +280,8 @@ If you want to learn more about building native executables, please consult http
 ## Related Guides
 
 - RESTEasy JAX-RS ([guide](https://quarkus.io/guides/rest-json)): REST endpoint framework implementing JAX-RS and more
+
+- Dev Services (([guide](https://quarkus.io/guides/dev-services))
 
 ## Provided Code
 
