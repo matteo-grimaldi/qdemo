@@ -203,11 +203,13 @@ Aggiungere un emitter e un POST endpoint per attivare un producer
 ...
 ```
 
-Utilizzare un consumer esterno per verificare la presenza del Kafka Broker e i messaggi prodotti tramite estensione dell'IDE o kcat:
+Una volta richiamata la POST API per inserire le richieste
 
 ```shell script
     curl -X POST http://localhost:8080/entity/cars/request 
 ```
+
+tilizzare un consumer esterno per verificare la presenza del Kafka Broker e i messaggi prodotti tramite estensione dell'IDE o kcat
 
 ```shell script
     kcat -b <broker-endpoint> -t <topic-name>
