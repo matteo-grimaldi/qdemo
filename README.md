@@ -63,7 +63,7 @@ aggiungi un paio di classi Java, NOTA: per la demo non e' importante usare i pac
 
 **Car.java**
 
-```shell script
+```java
 package org.acme;
 
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
@@ -80,7 +80,7 @@ public class Car extends PanacheMongoEntity {
 
 **CarResource.java**
 
-```shell script
+```java
 package org.acme;
 
 import java.util.List;
@@ -143,7 +143,7 @@ Solo al fine di mostrare l'utilizzo di Panache si può a questo punto aggiungere
 
 aggiungere le seguenti righe:
 
-```shell script
+```java
 import java.util.List;
 
 ...
@@ -159,7 +159,7 @@ import java.util.List;
 
 aggiungere le seguenti righe:
 
-```shell script
+```java
 ...
 
     @GET
@@ -219,7 +219,7 @@ tilizzare un consumer esterno per verificare la presenza del Kafka Broker e i me
 
 Aggiungere il dockerfile (spiegare il motivo del multi-stage build)
 
-```shell script
+```docker
 # Build stage using Red Hat UBI 8 base image to compile and package application
 FROM registry.access.redhat.com/ubi8/openjdk-11 as build
 
