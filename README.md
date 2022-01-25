@@ -173,7 +173,47 @@ aggiungere le seguenti righe:
 
 inserire o cancellare oggetti dal database ed utilizzare la ricerca *By Brand*.
 
-#### PASSO 3 - mettere l'applicazione in un container
+#### PASSO 3 - aggiungere le esterioni per il reactive messaging con smallRye e Kafka
+
+in **dev mode** da un'altra finestra del terminale aggiungi le estensioni per Panache usando il comando: 
+
+```shell script
+./mvnw quarkus:add-extension -Dextensions="quarkus-smallrye-reactive-messaging-kafka"
+```
+
+**Car.java**
+
+Aggiungere un emitter e un POST endpoint per attivare un producer
+
+```java
+...
+
+    @Channel("requests")
+    Emitter<String> myEmitter;
+
+    @POST
+    @Path("/request")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String createRequest() {
+        UUID uuid = UUID.randomUUID();
+        myEmitter.send(uuid.toString());
+        return uuid.toString() + " booking added.";
+    }
+
+...
+```
+
+Utilizzare un consumer esterno per verificare la presenza del Kafka Broker e i messaggi prodotti tramite estensione dell'IDE o kcat:
+
+```shell script
+    curl -X POST http://localhost:8080/entity/cars/request 
+```
+
+```shell script
+    kcat -b <broker-endpoint> -t <topic-name>
+```
+
+#### PASSO 4 - mettere l'applicazione in un container
 
 Aggiungere il dockerfile (spiegare il motivo del multi-stage build)
 
@@ -209,7 +249,7 @@ eseguire l'applicazione tramite podman
 quando l'applicazione viene eseguita dentro un container l'indirizzo *localhost* non è più valido occorre quindi fornire l'apposita variabile di riferimento, nell'esempio occorre sostituire l'indirizzo con quello ip della macchina dove è in esecuzione il database MongoDB.
 
 
-#### PASSO 4 - creare repo GIT
+#### PASSO 5 - creare repo GIT
 
 Aggiungere il progetto ad un repo GIT - [documentation]{https://docs.github.com/en/github/importing-your-projects-to-github/importing-source-code-to-github/adding-an-existing-project-to-github-using-the-command-line}.
 
@@ -225,7 +265,7 @@ questi passaggi richiedono che sia installato sul pc il tool *gh* (GitHub intera
 
 seguire il processo interattivo.
 
-#### PASSO 5 - Red Hat OpenShift
+#### PASSO 6 - Red Hat OpenShift
 
 Se è stato creato il repo su GitHub a questo punto è possibile installare l'applicazione su una piattaforma OpenShift.
 
