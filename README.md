@@ -139,7 +139,7 @@ public class CarResource {
 Per inzializzare la collection dell'istanza MongoDB avviata dai Dev Services, è possibile sfruttare direttamente le API esposte dall'applicazione:
 
 ```shell script
-> curl -X POST http://localhost:8080/cars -H "Content-Type: application/json" -d '{"brand":"fiat","name":"panda"}'
+> curl -X POST http://localhost:8080/cars -H "Content-Type: application/json" -d '{"brand":"fiat","model":"panda"}'
 ```
 
 L'applicazione genererà un errore, perchè non a conoscenza del nome del database. Esaminando l'errore, il servizio necessita la configurazione del nome del database, è sufficiente sfruttare la Dev UI e cercare la property quarkus.mongodb.database per dare un nome arbitrario alla basedati.
