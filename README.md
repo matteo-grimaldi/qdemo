@@ -10,10 +10,11 @@ La demo è divisa in 3 parti:
     - Download di un archivio di quickstart
     - Build e Run di un primo MVP di applicazione
     - Overview del Dev Mode
+    - Dimostrazione delle estensioni per facilitare la generazione dei manifest
 - **Seconda Parte**
     - Aggiunta estensioni per persistenza e messaging
     - Overview sui Dev Services
-    - Overview su Continous Testing
+    - Evidenza del supporto tramite devUI
 - **Terza Parte**
     - Overview su Migration Toolkit for Application per il passaggio da Spring Boot a Quarkus
 
@@ -34,7 +35,7 @@ Genera il pacchetto per cominciare un progetto da https://code.quarkus.io/
 
 per iniziare aggiungi solo le estensioni RESTEasy JAX-RS e RESTEasy jackson.
 
-scarica lo zip, estrai il file in una directory locale, apri un terminale ed esegui il comando:
+scarica lo zip, estrai il file in una directory locale, apri un terminale ed, assicurandosi di avere la corretta versione java compatibile (in caso usare ```jenv local ...```), esegui il comando:
 
 ```shell script
 > ./mvnw compile quarkus:dev
@@ -52,7 +53,65 @@ In **dev mode** edita la classe *GreetingResource.java* e cambia il saluto, (se 
 
 **NOTA:** aggiornare di conseguenza anche la classe di test altrimenti la compilazione in fase di build non funziona.
 
+Aggiungiamo ora un nuovo metodo su GreetingResource.java
+
+```java
+ @GET
+    @Path("/{magicNumber}")
+    public String isEvenOrOdd(@PathParam("magicNumber") int magicNumber) {
+        return magicNumber % 2 == 0 ? "That's Even" : "That's Odd";
+    }
+```
+
+ed un relativo test in GreetingResourceTest.java
+
+```java
+@Test
+    public void testIsEven() {
+        given()
+            .pathParam("magicNumber", 2)
+            .when().get("/hello/{magicNumber}")
+            .then()
+                .statusCode(200)
+                .body(is("That's Even"));
+    }
+```
+
+Sempre in dev Mode, tramite il menù o dalla console in dev UI (http://localhost:8080/q/dev/), è possibile abilitare la modalità "broken only" dove i soli test che non passano verranno ritestati (è possibile verificare la differenza vedendo i numeri di test "run" (quelli che prima passavano verranno mantenuti come "passed"). In questo modo è possibile verificare come cambiando il codice, vengano eseguiti i soli test che all'attivazione erano in fail.
+
+#### PASSO 3
+
+Aggiungere l'estensione di kubernetes per dimostrare la generazione dei manifest per l'ipotetico servizio associato
+
+```shell script
+./mvnw quarkus:add-extensions -Dextensions="quarkus-kubernetes"
+
+./mvnw clean package   
+```
+
+Aggiungere l'estensione di kubernetes per dimostrare la generazione degli helm chart per l'ipotetico servizio associato. In questo caso è anche necessario specificare la piattaforma target per generare il flavor corretto e un nome per il chart
+
+```shell script
+./mvnw quarkus:add-extensions -Dextensions="quarkus-helm"
+```
+
+Aggiungere in application.properties 
+
+```shell script
+quarkus.kubernetes.deployment-target=openshift
+quarkus.helm.name=showcase
+```
+
+E poi come di consueto
+
+```shell script
+./mvnw clean package 
+```
+
+I manifest e i chart saranno generati nella cartella target, dentro a dei folder dedicati.
+
 ### Seconda Parte
+
 
 #### PASSO 1 - aggiungere le estensioni per MongoDB
 
@@ -182,6 +241,11 @@ aggiungere le seguenti righe:
 
 inserire o cancellare oggetti dal database ed utilizzare la ricerca *By Brand*.
 
+```shell script
+curl http://localhost:8080/cars/fiat
+````
+
+
 #### PASSO 3 - aggiungere le esterioni per il reactive messaging con smallRye e Kafka
 
 in **dev mode** da un'altra finestra del terminale aggiungi l'estensione per il reactive messaging con kafka tramite il comando: 
@@ -190,11 +254,16 @@ in **dev mode** da un'altra finestra del terminale aggiungi l'estensione per il 
 > ./mvnw quarkus:add-extension -Dextensions="quarkus-smallrye-reactive-messaging-kafka"
 ```
 
-**Car.java**
+**GreetingResource.java**
 
 Aggiungere un emitter e un POST endpoint per attivare un producer
 
 ```java
+import java.util.UUID;
+
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
+
 ...
 
     @Channel("requests")
@@ -205,7 +274,7 @@ Aggiungere un emitter e un POST endpoint per attivare un producer
     @Produces(MediaType.TEXT_PLAIN)
     public String createRequest() {
         UUID uuid = UUID.randomUUID();
-        myEmitter.send(uuid.toString());
+        myEmitter.send("Booking: " + uuid.toString());
         return uuid.toString() + " booking added.";
     }
 
@@ -215,14 +284,18 @@ Aggiungere un emitter e un POST endpoint per attivare un producer
 Una volta richiamata la POST API per inserire le richieste
 
 ```shell script
-> curl -X POST http://localhost:8080/cars/request 
+> curl -X POST http://localhost:8080/hello/request 
 ```
+
+Se il risultato è positivo, verrà confermata l'aggiunta della prenotazione, come da return vaule del metodo.
 
 utilizzare un consumer esterno per verificare la presenza del Kafka Broker e i messaggi prodotti tramite estensione dell'IDE o kcat
 
 ```shell script
 > kcat -b <broker-endpoint> -t <topic-name>
 ```
+
+Un'altra alternativa è quella di utilizzare la devUI e il componente di Kafka client (che è ovviamente anche compatibile con il testcontainer basato su RedPanda) per consultare graficamente da browser il contenuto dei vari topic.
 
 ### Terza Parte
 
